@@ -1,0 +1,23 @@
+{
+  "authz": false,
+  "cookie": "__Host-socketzero-authservice-session-id-cookie",
+  "redisHost": "localhost:6379",
+  "redisPassword": "",
+  "upgraderDisabled": true,
+  "tunnels": [
+    {
+      "hostname": "web-server.apps.socketzero.com",
+      "listenPort": 80,
+      "targetPort": 80,
+      "transport": "tcp",
+      "targetHost": "${web_server_ip}",
+      "friendlyName": "Web Server Tunnel",
+      "iconUrl": "",
+      "action": "url",
+      "roles": ["admin"],
+      "details": [
+        "web-server.apps.socketzero.com"
+      ]
+    }
+  ]
+}

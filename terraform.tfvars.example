@@ -1,0 +1,25 @@
+# SocketZero Terraform Configuration Example
+# Copy this file to terraform.tfvars and update with your values
+
+# Your existing Route53 hosted zone (required)
+aws_route53_zone = "your-domain.com"
+
+# Port that SocketZero receiver listens on
+receiver_port = 9997
+
+# IP addresses/CIDRs allowed to access the load balancer
+# Add your current IP address here!
+trusted_ip_cidrs = [
+  "203.0.113.1/32",    # Replace with your IP
+  # "198.51.100.0/24", # Optional: Add office network
+  # "192.0.2.0/24",    # Optional: Add VPN network
+]
+
+# SocketZero version and AMI configuration
+# Get the AMI by subscribing at: https://aws.amazon.com/marketplace/pp/prodview-qjqz3izsnofoo
+socketzero_version = "stable-1.0.0"
+socketzero_ami_id  = "ami-08a1c83424ca22b36"  # Stable 1.0.0 marketplace AMI
+
+# Optional: Custom KMS key for EBS encryption
+# If not specified, uses AWS managed encryption key
+# kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012" 
