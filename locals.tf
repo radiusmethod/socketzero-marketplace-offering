@@ -3,7 +3,7 @@ data "aws_region" "current" {}
 
 locals {
   aws_account_id = data.aws_caller_identity.current.account_id
-  aws_region     = data.aws_region.current.name
+  aws_region     = data.aws_region.current.id
 
   vpc_cidr = "10.10.0.0/16"
   azs      = ["us-east-1a", "us-east-1b", "us-east-1c"]
