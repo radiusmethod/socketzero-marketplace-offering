@@ -8,7 +8,7 @@ Deploy SocketZero on AWS using Terraform with best practices for security and pr
 - **Subscribe to SocketZero on AWS Marketplace**: [Get SocketZero AMI](https://aws.amazon.com/marketplace/pp/prodview-qjqz3izsnofoo)
 - AWS CLI configured with appropriate permissions
 - Terraform installed (>= 1.0)
-- Existing Route53 Public hosted zone
+- Existing Route53 public hosted zone with a registered domain using Route53 nameservers
 - IP addresses for security group access
 
 ### 3-Step Deployment
