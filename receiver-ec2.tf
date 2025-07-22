@@ -24,7 +24,7 @@ resource "aws_security_group_rule" "receiver_from_lb" {
 
 resource "aws_instance" "socketzero_receiver" {
   ami                         = var.socketzero_ami_id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.socketzero_ami.name

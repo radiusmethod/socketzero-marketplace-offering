@@ -18,7 +18,7 @@ trusted_ip_cidrs = [
 # SocketZero version and AMI configuration
 # Get the AMI by subscribing at: https://aws.amazon.com/marketplace/pp/prodview-qjqz3izsnofoo
 socketzero_version = "stable-1.0.0"
-socketzero_ami_id  = "ami-08a1c83424ca22b36"  # Stable 1.0.0 marketplace AMI
+socketzero_ami_id  = "ami-08a1c83424ca22b36"  # Replace with your AMI ID
 
 # Optional: Custom KMS key for EBS encryption
 # If not specified, uses AWS managed encryption key

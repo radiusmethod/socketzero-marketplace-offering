@@ -36,7 +36,7 @@ trusted_ip_cidrs = ["YOUR.IP.ADDRESS/32"]
 
 # SocketZero version and AMI configuration
 socketzero_version = "stable-1.0.0"
-socketzero_ami_id  = "ami-08a1c83424ca22b36"
+socketzero_ami_id  = "your-ami-id"
 ```
 
 #### Step 3: Deploy
