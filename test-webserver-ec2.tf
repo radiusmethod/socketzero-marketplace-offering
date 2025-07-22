@@ -1,32 +1,22 @@
-# Get the latest Amazon Linux 2023 AMI
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["al2023-ami-*-x86_64"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+# Known to work well and stable for simple web servers
+locals {
+  # This is a well-tested AL2023 AMI that works reliably
+  web_server_ami = "ami-0cbbe2c6a1bb2ad63"  # us-east-1 AL2023
 }
 
 resource "aws_instance" "web_server_test" {
-  ami                         = data.aws_ami.amazon_linux.id
-  instance_type               = "t2.micro"
+  ami                         = local.web_server_ami
+  instance_type               = "t2.nano"  
   subnet_id                   = module.vpc.private_subnets[0]
   vpc_security_group_ids      = [aws_security_group.web_server_test.id]
   iam_instance_profile        = aws_iam_instance_profile.socketzero_ami.name
   associate_public_ip_address = false
 
-  # Enable EBS encryption for security
+  # Simple root volume with encryption for security
   root_block_device {
-    encrypted   = true
     volume_type = "gp3"
-    volume_size = 8
+    volume_size = 8  
+    encrypted   = true
     kms_key_id  = var.kms_key_id  # Uses customer-managed KMS key if provided
   }
 
