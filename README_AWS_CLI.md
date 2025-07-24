@@ -10,6 +10,7 @@ This guide shows how to deploy the SocketZero infrastructure using AWS CLI comma
   - [SocketZero Client Application Requirement](#socketzero-client-application-requirement)
   - [Subscription Benefits](#subscription-benefits)
   - [Internet Connection Requirement](#internet-connection-requirement)
+  - [SSH Access](#ssh-access)
 - [Prerequisites](#prerequisites)
 - [Deployment Overview](#deployment-overview)
 - [Step-by-Step Deployment](#step-by-step-deployment)
@@ -43,6 +44,9 @@ Customers receive full access to SocketZero after subscribing to the AMI and up 
 This product requires an internet connection to deploy properly. The test web server downloads and installs nginx during deployment.
 
 > ⚠️ **Important**: Ensure your deployment environment has outbound internet access for package downloads and AWS service communications.
+
+### SSH Access
+The SocketZero AMI uses **`ubuntu`** as the SSH username.
 
 ## Prerequisites
 
@@ -793,5 +797,3 @@ aws acm delete-certificate --certificate-arn $CERT_ARN
 ```
 
 ---
-
-**Note**: This AWS CLI approach is much more complex than Terraform! Terraform handles dependencies, state management, and cleanup automatically. Use this guide for learning or when you specifically need to avoid Terraform. 

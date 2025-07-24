@@ -10,6 +10,7 @@ This guide shows how to deploy the SocketZero infrastructure using the AWS Conso
   - [SocketZero Client Application Requirement](#socketzero-client-application-requirement)
   - [Subscription Benefits](#subscription-benefits)
   - [Internet Connection Requirement](#internet-connection-requirement)
+  - [SSH Access](#ssh-access)
 - [Prerequisites](#prerequisites)
 - [Deployment Overview](#deployment-overview)
 - [Step-by-Step Console Deployment](#step-by-step-console-deployment)
@@ -72,9 +73,12 @@ This SocketZero AMI extends the functionality of the SocketZero Client Applicati
 Customers receive full access to SocketZero after subscribing to the AMI and up to **5 free connections**. Additional connections may require separate licensing arrangements.
 
 ### Internet Connection Requirement
-This product requires an internet connection to deploy properly. Terraform will download and install nginx for the test web server during deployment.
+This product requires an internet connection to deploy properly. The test web server downloads and installs nginx during deployment.
 
 > ⚠️ **Important**: Ensure your deployment environment has outbound internet access for package downloads and AWS service communications.
+
+### SSH Access
+The SocketZero AMI uses **`ubuntu`** as the SSH username.
 
 ## Prerequisites
 
@@ -98,19 +102,16 @@ We'll create the infrastructure in this order:
 
 ### Configuration Values to Use
 
-Before starting, note these values you'll need throughout:
+Before starting, gather these 3 values you'll need throughout:
 
+**🔧 REPLACE WITH YOUR VALUES:**
 ```
-VPC CIDR: 10.10.0.0/16
-Public Subnet 1: 10.10.1.0/24 (us-east-1a)
-Public Subnet 2: 10.10.2.0/24 (us-east-1b)  
-Private Subnet 1: 10.10.128.0/24 (us-east-1a)
-Private Subnet 2: 10.10.129.0/24 (us-east-1b)
-Your Domain: your-domain.com
-Your IP: YOUR.IP.ADDRESS/32
-Receiver Port: 9997
-SocketZero AMI: ami-REPLACE_WITH_YOUR_AMI_ID (find yours in AWS Marketplace)
+Your Domain: your-domain.com ← REPLACE with your registered domain that uses Route53 nameservers
+Your IP: YOUR.IP.ADDRESS/32 ← REPLACE with your actual IP address  
+SocketZero AMI: ami-REPLACE_WITH_YOUR_AMI_ID ← REPLACE with your unique AMI ID from AWS Marketplace
 ```
+
+> 💡 **Note**: All networking values (VPC CIDRs, subnet ranges, ports) are provided in each step where needed.
 
 ### Step 0.5: EC2 Key Pair Setup (for SSH Access)
 
@@ -715,13 +716,13 @@ If you see the web page, congratulations! Your SocketZero deployment is working 
 5. **Access Instances via SSH** (Alternative):
    - **SocketZero Receiver** (public subnet):
      ```bash
-     ssh -i your-key-pair.pem ec2-user@<receiver-public-ip>
+     ssh -i your-key-pair.pem ubuntu@<receiver-public-ip>
      ```
    - **Test Web Server** (private subnet, via receiver as bastion):
      ```bash
      # First SSH to receiver, then SSH to web server
-     ssh -i your-key-pair.pem ec2-user@<receiver-public-ip>
-     ssh ec2-user@<web-server-private-ip>
+     ssh -i your-key-pair.pem ubuntu@<receiver-public-ip>
+     ssh ubuntu@<web-server-private-ip>
      ```
 
 ### Troubleshooting
@@ -744,7 +745,7 @@ If you see the web page, congratulations! Your SocketZero deployment is working 
 **SSH Connection Issues:**
 - Verify your IP is allowed in security group rules (port 22)
 - Check key pair permissions: `chmod 400 your-key-pair.pem`
-- Use correct username: `ec2-user` for SocketZero AMI, `ubuntu` for Ubuntu
+- Use correct username: `ubuntu` for SocketZero AMI, `ubuntu` for Ubuntu test server
 - For web server access, SSH through receiver instance (bastion host)
 - Ensure you're using the correct key pair file that matches what you selected during instance launch
 
@@ -1049,5 +1050,3 @@ aws ec2 describe-vpcs --filters "Name=tag:Name,Values=socketzero-ami" --query 'V
 > ⚠️ **Important**: Deleting resources will stop all billing for those services. Make sure you've backed up any important data or configurations before proceeding with cleanup.
 
 ---
-
-**Note**: Using the AWS Console is educational but much more time-consuming than Terraform! This manual approach helps you understand the underlying AWS services, but for production deployments, Infrastructure as Code (Terraform) is strongly recommended for consistency, repeatability, and maintainability.

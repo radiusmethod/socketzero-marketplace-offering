@@ -5,6 +5,10 @@ Deploy SocketZero on AWS using Terraform with best practices for security and pr
 ## Table of Contents
 
 - [Important Notes](#important-notes)
+  - [SocketZero Client Application Requirement](#socketzero-client-application-requirement)
+  - [Subscription Benefits](#subscription-benefits)
+  - [Internet Connection Requirement](#internet-connection-requirement)
+  - [SSH Access](#ssh-access)
 - [Quick Start Guide](#quick-start-guide)
   - [Prerequisites](#prerequisites)
   - [3-Step Deployment](#3-step-deployment)
@@ -45,6 +49,9 @@ Customers receive full access to SocketZero after subscribing to the AMI and up 
 This product requires an internet connection to deploy properly. Terraform will download and install nginx for the test web server during deployment.
 
 > ⚠️ **Important**: Ensure your deployment environment has outbound internet access for package downloads and AWS service communications.
+
+### SSH Access
+The SocketZero AMI uses **`ubuntu`** as the SSH username.
 
 ## Quick Start Guide
 
@@ -388,7 +395,7 @@ After your SocketZero deployment is working, you can add tunnels to other applic
    Test connectivity from the SocketZero receiver to your target service:
    ```bash
    # Connect to SocketZero receiver via SSH or Session Manager
-   ssh -i your-key.pem ec2-user@<receiver-public-ip>
+   ssh -i your-key.pem ubuntu@<receiver-public-ip>
    # OR: EC2 → Instances → socketzero-receiver → Connect → Session Manager
    
    # Test connectivity (replace with your target IP/hostname and port)
