@@ -42,7 +42,7 @@ This SocketZero AMI extends the functionality of the SocketZero Client Applicati
 Customers receive full access to SocketZero after subscribing to the AMI and up to **5 free connections**. Additional connections may require separate licensing arrangements.
 
 ### Internet Connection Requirement
-This product requires an internet connection to deploy properly. Terraform will download and install packages during deployment including system updates, web server software, and SocketZero service configurations.
+This product requires an internet connection to deploy properly. Terraform will download and install nginx for the test web server during deployment.
 
 > ⚠️ **Important**: Ensure your deployment environment has outbound internet access for package downloads and AWS service communications.
 
@@ -468,8 +468,8 @@ After your SocketZero deployment is working, you can add tunnels to other applic
 6. **Test New Tunnels**:
    - Connect with your SocketZero client
    - Access the new tunnel endpoints:
-     - `http://database.apps.socketzero.com:3306`
-     - `http://api.apps.socketzero.com:8080`
+     - `http://database.apps.socketzero.com`
+     - `http://api.apps.socketzero.com`
 
 ### Tunnel Configuration Parameters
 

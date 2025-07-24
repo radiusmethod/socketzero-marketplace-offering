@@ -740,4 +740,326 @@ If you see the web page, congratulations! Your SocketZero deployment is working 
 
 **Target Group Unhealthy:**
 - Check security groups allow port 9997
-- Verify SocketZero service is running: `
+- Verify SocketZero service is running: `sudo systemctl status socketzero-receiver`
+- Check logs: `sudo journalctl -u socketzero-receiver -f`
+
+**DNS Not Resolving:**
+- Wait for DNS propagation (up to 24 hours)
+- Check Route53 record is correct
+- Test with: `nslookup ami.your-domain.com`
+
+**Certificate Issues:**
+- Ensure certificate is in us-east-1 region
+- Verify DNS validation completed
+- Check domain matches exactly
+
+**SSH Connection Issues:**
+- Verify your IP is allowed in security group rules (port 22)
+- Check key pair permissions: `chmod 400 your-key-pair.pem`
+- Use correct username: `ec2-user` for SocketZero AMI, `ubuntu` for Ubuntu
+- For web server access, SSH through receiver instance (bastion host)
+- Ensure you're using the correct key pair file that matches what you selected during instance launch
+
+### Resource Summary
+
+**Created Resources:**
+- 1 VPC with 4 subnets across 2 AZs
+- 1 Internet Gateway + 1 NAT Gateway
+- 3 Security Groups with proper rules
+- 1 IAM Role with SSM access
+- 1 SSL Certificate (ACM)
+- 1 Application Load Balancer + Target Group
+- 2 EC2 instances (encrypted storage)
+- 1 Route53 CNAME record
+
+## Adding Additional Tunnels
+
+After your SocketZero deployment is working, you can add tunnels to other applications and services.
+
+### Requirements for Additional Tunnels
+
+**Network Accessibility:**
+- Target applications/assets must be accessible from the SocketZero receiver instance
+- This means they should be in the same VPC, connected VPCs, or accessible via VPN/Transit Gateway
+- Security groups must allow traffic from the SocketZero receiver to the target service
+
+**Common Scenarios:**
+- **Same VPC**: Applications in private subnets of the `socketzero-ami` VPC
+- **Connected VPCs**: Applications in peered VPCs or Transit Gateway connected networks
+- **On-premises**: Applications accessible via VPN or Direct Connect
+- **Public services**: Internet-accessible applications (with proper security)
+
+### Adding a New Tunnel
+
+1. **Verify Network Connectivity**:
+   Test connectivity from the SocketZero receiver to your target service:
+   ```bash
+   # Connect to SocketZero receiver
+   # EC2 → Instances → socketzero-receiver → Connect → Session Manager
+   
+   # Test connectivity (replace with your target IP/hostname and port)
+   telnet 10.0.1.100 3306  # Example: MySQL database
+   curl -I http://10.0.2.50:8080  # Example: Web application
+   ```
+
+2. **Update Security Groups** (if needed):
+   - Ensure target service security groups allow traffic from SocketZero receiver
+   - Update receiver security group if additional outbound rules are needed
+
+3. **Update SocketZero Configuration**:
+   ```bash
+   # Connect to SocketZero receiver
+   # Backup current configuration
+   sudo cp /opt/socketzero/config.json /opt/socketzero/config.json.backup
+   
+   # Edit configuration to add new tunnel
+   sudo nano /opt/socketzero/config.json
+   ```
+
+4. **Example Updated Configuration**:
+   ```json
+   {
+     "authz": false,
+     "cookie": "__Host-socketzero-authservice-session-id-cookie",
+     "redisHost": "localhost:6379",
+     "redisPassword": "",
+     "upgraderDisabled": true,
+     "tunnels": [
+       {
+         "hostname": "web-server.apps.socketzero.com",
+         "listenPort": 80,
+         "targetPort": 80,
+         "transport": "tcp",
+         "targetHost": "10.10.128.45",
+         "friendlyName": "Web Server Tunnel",
+         "roles": ["admin"]
+       },
+       {
+         "hostname": "database.apps.socketzero.com",
+         "listenPort": 3306,
+         "targetPort": 3306,
+         "transport": "tcp",
+         "targetHost": "10.0.1.100",
+         "friendlyName": "MySQL Database",
+         "roles": ["admin"]
+       },
+       {
+         "hostname": "api.apps.socketzero.com",
+         "listenPort": 8080,
+         "targetPort": 8080,
+         "transport": "tcp",
+         "targetHost": "internal-api.company.local",
+         "friendlyName": "Internal API",
+         "roles": ["admin"]
+       }
+     ]
+   }
+   ```
+
+5. **Apply Configuration Changes**:
+   ```bash
+   # Validate JSON syntax
+   cat /opt/socketzero/config.json | jq
+   
+   # Restart SocketZero service
+   sudo systemctl restart socketzero-receiver
+   
+   # Verify service is running
+   sudo systemctl status socketzero-receiver
+   
+   # Check logs for any errors
+   sudo journalctl -u socketzero-receiver -f
+   ```
+
+6. **Test New Tunnels**:
+   - Connect with your SocketZero client
+   - Access the new tunnel endpoints:
+     - `http://database.apps.socketzero.com`
+     - `http://api.apps.socketzero.com`
+
+### Tunnel Configuration Parameters
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `hostname` | Client-side hostname for accessing the tunnel | `myapp.apps.socketzero.com` |
+| `listenPort` | Port the tunnel listens on (client-side) | `8080` |
+| `targetPort` | Port on the target service | `80` |
+| `transport` | Protocol (usually `tcp`) | `tcp` |
+| `targetHost` | IP or hostname of target service | `10.0.1.50` or `myservice.local` |
+| `friendlyName` | Display name in SocketZero client | `My Application` |
+| `roles` | Access control (typically `["admin"]`) | `["admin"]` |
+
+### Common Tunnel Examples
+
+**Database Access:**
+```json
+{
+  "hostname": "postgres.apps.socketzero.com",
+  "listenPort": 5432,
+  "targetPort": 5432,
+  "transport": "tcp",
+  "targetHost": "10.0.1.200",
+  "friendlyName": "PostgreSQL Database",
+  "roles": ["admin"]
+}
+```
+
+**SSH Access:**
+```json
+{
+  "hostname": "server.apps.socketzero.com",
+  "listenPort": 22,
+  "targetPort": 22,
+  "transport": "tcp",
+  "targetHost": "10.0.2.100",
+  "friendlyName": "Internal Server SSH",
+  "roles": ["admin"]
+}
+```
+
+**Web Applications:**
+```json
+{
+  "hostname": "grafana.apps.socketzero.com",
+  "listenPort": 3000,
+  "targetPort": 3000,
+  "transport": "tcp",
+  "targetHost": "monitoring.internal.company.com",
+  "friendlyName": "Grafana Dashboard",
+  "roles": ["admin"]
+}
+```
+
+### Troubleshooting Additional Tunnels
+
+**Connection Issues:**
+- Verify network connectivity from receiver to target
+- Check security group rules allow required ports
+- Ensure target service is running and accessible
+- Test with `telnet` or `curl` from receiver instance
+
+**Configuration Issues:**
+- Validate JSON syntax with `jq`
+- Check SocketZero service logs: `sudo journalctl -u socketzero-receiver -f`
+- Ensure no port conflicts between tunnels
+- Verify hostname uniqueness for each tunnel
+
+## Cleanup
+
+### Partial Cleanup - Remove Demo Components Only
+
+If you want to keep your SocketZero infrastructure but remove the demo/test components:
+
+#### Remove Test Web Server
+
+1. **Update SocketZero Configuration** (remove web server tunnel):
+   ```bash
+   # Connect to SocketZero receiver
+   # EC2 → Instances → socketzero-receiver → Connect → Session Manager
+   
+   # Backup current configuration
+   sudo cp /opt/socketzero/config.json /opt/socketzero/config.json.backup
+   
+   # Edit configuration to remove web server tunnel
+   sudo tee /opt/socketzero/config.json > /dev/null << EOF
+   {
+     "authz": false,
+     "cookie": "__Host-socketzero-authservice-session-id-cookie",
+     "redisHost": "localhost:6379",
+     "redisPassword": "",
+     "upgraderDisabled": true,
+     "tunnels": [
+       // Add your production tunnels here instead of the test web server
+     ]
+   }
+   EOF
+   
+   # Restart SocketZero service
+   sudo systemctl restart socketzero-receiver
+   ```
+
+2. **Terminate Test Web Server Instance**:
+   - Go to EC2 → Instances
+   - Select `test-web-server`
+   - Instance state → Terminate instance
+   - Confirm termination
+
+3. **Delete Web Server Security Group** (optional):
+   - Go to VPC → Security groups
+   - Select `web-server-test`
+   - Actions → Delete security group
+   - Confirm deletion
+
+#### What Remains After Partial Cleanup
+
+Your SocketZero infrastructure will continue running with:
+- ✅ **SocketZero Receiver instance** (ready for production tunnels)
+- ✅ **Application Load Balancer** (accessible via your domain)
+- ✅ **VPC and networking** (for connecting to your applications)
+- ✅ **SSL Certificate** (for secure access)
+- ✅ **Route53 DNS** (domain pointing to your receiver)
+
+You can now add tunnels to your actual production applications and services.
+
+### Full Cleanup - Remove Everything
+
+To completely remove all SocketZero infrastructure (in reverse dependency order):
+
+1. **Delete EC2 Instances**:
+   - Terminate `socketzero-receiver` and `test-web-server` instances
+   
+2. **Delete Load Balancer and Target Group**:
+   - Delete Application Load Balancer
+   - Delete Target Group
+   
+3. **Delete NAT Gateway and release Elastic IP**:
+   - Delete NAT Gateway
+   - Release Elastic IP address
+   
+4. **Delete Route53 records**:
+   - Delete `ami.your-domain.com` CNAME record
+   - Delete ACM validation records
+   
+5. **Delete ACM Certificate**:
+   - Delete SSL certificate from Certificate Manager
+   
+6. **Delete Security Groups**:
+   - Delete `socketzero-receiver-lb`
+   - Delete `socketzero-receiver`  
+   - Delete `web-server-test` (if not already deleted)
+   
+7. **Delete Subnets**:
+   - Delete all 4 subnets (2 public, 2 private)
+   
+8. **Delete Route Tables**:
+   - Delete custom route tables (keep default VPC route table)
+   
+9. **Delete Internet Gateway**:
+   - Detach and delete Internet Gateway
+   
+10. **Delete VPC**:
+    - Delete the `socketzero-ami` VPC
+    
+11. **Delete IAM Role**:
+    - Delete `socketzero-ami-role` IAM role
+
+### Cleanup Verification
+
+After cleanup, verify all resources are removed:
+
+```bash
+# Check for remaining EC2 instances
+aws ec2 describe-instances --filters "Name=tag:Name,Values=socketzero-receiver" --query 'Reservations[].Instances[].State.Name'
+
+# Check for remaining load balancers
+aws elbv2 describe-load-balancers --query 'LoadBalancers[?contains(LoadBalancerName, `socketzero`)].LoadBalancerName'
+
+# Check for remaining VPCs
+aws ec2 describe-vpcs --filters "Name=tag:Name,Values=socketzero-ami" --query 'Vpcs[].VpcId'
+```
+
+> ⚠️ **Important**: Deleting resources will stop all billing for those services. Make sure you've backed up any important data or configurations before proceeding with cleanup.
+
+---
+
+**Note**: Using the AWS Console is educational but much more time-consuming than Terraform! This manual approach helps you understand the underlying AWS services, but for production deployments, Infrastructure as Code (Terraform) is strongly recommended for consistency, repeatability, and maintainability.
