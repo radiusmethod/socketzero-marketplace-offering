@@ -1,5 +1,7 @@
 # SocketZero Deployment using AWS CLI
 
+This guide provides complete instructions to setup the SocketZero Receiver EC2 instance from the [AWS Marketplace SocketZero AMI](https://aws.amazon.com/marketplace/pp/prodview-qjqz3izsnofoo), all of the supporting AWS infrastructure, and a sample tunnel using a basic webserver. It also provides examples to implement new tunnels and tear down the example tunnel.
+
 This guide shows how to deploy the SocketZero infrastructure using AWS CLI commands instead of Terraform. This is equivalent to the Terraform configuration in this repository.
 
 > **💡 Looking for an easier way?** Consider using the **[Terraform configuration](README.md)** instead! It automates all the steps below and is much faster to deploy. This manual guide is provided for learning purposes and situations where Terraform isn't available.

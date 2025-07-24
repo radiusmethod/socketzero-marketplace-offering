@@ -1,5 +1,7 @@
 # SocketZero AWS Marketplace Terraform Examples
 
+This guide provides complete instructions to setup the SocketZero Receiver EC2 instance from the [AWS Marketplace SocketZero AMI](https://aws.amazon.com/marketplace/pp/prodview-qjqz3izsnofoo), all of the supporting AWS infrastructure, and a sample tunnel using a basic webserver. It also provides examples to implement new tunnels and tear down the example tunnel.
+
 Deploy SocketZero on AWS using Terraform with best practices for security and production readiness.
 
 ## Table of Contents
