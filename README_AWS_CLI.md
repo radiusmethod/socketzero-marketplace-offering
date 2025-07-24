@@ -87,6 +87,9 @@ export RECEIVER_PORT="9997"
 export SOCKETZERO_AMI_ID="ami-REPLACE_WITH_YOUR_AMI_ID"  # Get from AWS Marketplace
 export KMS_KEY_ID=""  # Optional: Your KMS key ARN
 
+# Multiple IP addresses: For multiple locations (office, home, team), you'll need to 
+# run the security group rule creation commands multiple times with different IPs
+
 # Get availability zones
 export AZ1=$(aws ec2 describe-availability-zones --region $AWS_REGION --query 'AvailabilityZones[0].ZoneName' --output text)
 export AZ2=$(aws ec2 describe-availability-zones --region $AWS_REGION --query 'AvailabilityZones[1].ZoneName' --output text)

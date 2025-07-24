@@ -109,7 +109,7 @@ Before starting, gather these 3 values you'll need throughout:
 **🔧 REPLACE WITH YOUR VALUES:**
 ```
 Your Domain: your-domain.com ← REPLACE with your registered domain that uses Route53 nameservers
-Your IP: YOUR.IP.ADDRESS/32 ← REPLACE with your actual IP address  
+Your IP: YOUR.IP.ADDRESS/32 ← REPLACE with your actual IP address (or multiple IPs/CIDRs for different locations)
 SocketZero AMI: ami-REPLACE_WITH_YOUR_AMI_ID ← REPLACE with your unique AMI ID from AWS Marketplace
 ```
 
@@ -321,6 +321,9 @@ Now that all security groups exist, we can add rules that reference each other:
    - **Port range**: 443
    - **Source**: Custom → `YOUR.IP.ADDRESS/32` (replace with your IP)
    - **Description**: `Allow HTTPS from trusted IPs`
+
+> 💡 **Multiple IP Addresses**: You can add multiple rules for different locations (office, home, team members). Click "Add rule" for each additional IP address or CIDR block you want to allow access.
+
 3. **Outbound rules** tab → Edit outbound rules → Add rule:
    - **Type**: Custom TCP
    - **Port range**: 9997
