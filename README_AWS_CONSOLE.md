@@ -72,19 +72,7 @@ This SocketZero AMI extends the functionality of the SocketZero Client Applicati
 Customers receive full access to SocketZero after subscribing to the AMI and up to **5 free connections**. Additional connections may require separate licensing arrangements.
 
 ### Internet Connection Requirement
-This product requires an internet connection to deploy properly. The following packages are downloaded during deployment:
-
-**For Test Web Server (Ubuntu):**
-- System updates via `apt update`
-- Nginx web server via `apt install nginx`
-
-**For SocketZero Receiver:**
-- SocketZero service updates and configuration files
-- SSL/TLS certificates for secure communication
-
-**For Infrastructure:**
-- AWS service communications (Route53, ACM, Load Balancer health checks)
-- DNS resolution and certificate validation
+This product requires an internet connection to deploy properly. Terraform will download and install nginx for the test web server during deployment.
 
 > ⚠️ **Important**: Ensure your deployment environment has outbound internet access for package downloads and AWS service communications.
 
